@@ -1,6 +1,6 @@
 <div align="center">
 
-# MIPS Pipelined Processor with Hardware Performance Monitoring Unit
+# MIPS Pipelined Processor with Hardware Performance Counters
 
 **A 5-stage pipelined MIPS processor implementing a Hardware Performance Monitoring Unit (PMU) in SystemVerilog**
 

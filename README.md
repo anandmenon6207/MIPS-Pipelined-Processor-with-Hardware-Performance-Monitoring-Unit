@@ -1,13 +1,8 @@
 <div align="center">
 
-# 🔬 MIPS Pipelined Processor with Hardware Performance Monitoring Unit
+# MIPS Pipelined Processor with Hardware Performance Monitoring Unit
 
 **A 5-stage pipelined MIPS processor implementing a Hardware Performance Monitoring Unit (PMU) in SystemVerilog**
-
-![SystemVerilog](https://img.shields.io/badge/SystemVerilog-IEEE_1800-blue?style=flat-square)
-![Simulator](https://img.shields.io/badge/Simulator-Icarus_Verilog_12.0-brightgreen?style=flat-square)
-![Status](https://img.shields.io/badge/Status-Complete-success?style=flat-square)
-![Institution](https://img.shields.io/badge/IIIT-Bangalore-orange?style=flat-square)
 
 *IE2025005 · Computer Architecture — Open Systems Lab*
 

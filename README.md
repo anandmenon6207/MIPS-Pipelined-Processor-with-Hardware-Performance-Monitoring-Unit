@@ -4,7 +4,7 @@
 
 **A 5-stage pipelined MIPS processor implementing a Hardware Performance Monitoring Unit (PMU) in SystemVerilog**
 
-*IE2025005 · Computer Architecture — Open Systems Lab*
+*IE2025005 · Computer Architecture — One Student Lab Project*
 
 </div>
 

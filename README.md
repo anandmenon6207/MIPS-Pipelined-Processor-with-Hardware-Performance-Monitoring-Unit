@@ -32,12 +32,6 @@ The pipeline handles all data and control hazards:
 │   ├── IE2025005_memfile.dat       # Hex-encoded MIPS program loaded into imem
 │   └── memfile_notes.txt           # Regarding instructions for MIPS program
 │
-├── docs/
-│   └── pipeline_diagram            # Architecture diagram
-│
-├── waveforms/
-│   └── IE2025005_pipeline.vcd      # GTKWave waveform output
-│
 └── README.md
 ```
 

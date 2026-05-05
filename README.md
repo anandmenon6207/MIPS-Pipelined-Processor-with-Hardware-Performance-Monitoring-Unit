@@ -156,12 +156,11 @@ gtkwave waveforms/IE2025005_pipeline.vcd
 
 ---
 
-## 🛠️ Tools
+🛠️ Tools
 
-Icarus Verilog 12.0 - Compilation and simulation 
-GTKWave - Waveform viewing 
-VS Code - Development environment  
-
+Icarus Verilog 12.0 — Compilation and simulation
+GTKWave — Waveform viewer
+VS Code — Development environment
 
 ---
 📚 References

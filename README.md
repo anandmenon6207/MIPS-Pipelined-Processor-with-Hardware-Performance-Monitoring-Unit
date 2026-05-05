@@ -164,3 +164,9 @@ VS Code - Development environment
 
 
 ---
+📚 References
+
+Harris, D. & Harris, S. (2012). Digital Design and Computer Architecture (2nd ed.) — Pipeline architecture, hazard unit design, and pipelined MIPS HDL implementation used as the structural foundation for this project.
+
+Watson, R. N. M. (2020–2021). Advanced Operating Systems: Hardware Performance Counters (HWPMC). University of Cambridge. — Covers the conceptual basis for hardware performance counters, real-world PMC implementations on ARM and x86 processors.
+

@@ -1,0 +1,59 @@
+--------------------------------------------------
+Conditions / Constraints
+--------------------------------------------------
+
+    - Maximum 64 instructions (imem has 64 slots)
+    - Every program MUST end with fc000000 (HALT)
+    - Supported instructions only:
+        R-type : add, sub, and, or, slt
+        I-type : addi, lw, sw, beq
+        J-type : j
+    - lw and sw use word-aligned addresses only (multiple of 4)
+    - dmem has 64 word slots — addresses beyond 0xFF will wrap or fail
+    - $zero (register 0) is hardwired to 0 — writes to it are ignored
+    - No floating point, no multiply/divide, no syscall
+
+--------------------------------------------------
+
+The memfile (IE2025005_memfile.dat) contains the hex-encoded MIPS program
+loaded into instruction memory at simulation start.
+
+IMPORTANT: Every program must end with FC000000 (HALT instruction).
+The testbench waits for HALT to reach Writeback before printing PMU results.
+
+--------------------------------------------------
+Current program: 10-instruction benchmark
+--------------------------------------------------
+
+Assembly:
+    addi $s0, $zero, 5      # $s0 = 5
+    addi $s1, $zero, 3      # $s1 = 3
+    add  $s2, $s0, $s1      # $s2 = 8
+    sub  $s3, $s0, $s1      # $s3 = 2
+    sw   $s2, 0($zero)      # mem[0] = 8
+    lw   $t0, 0($zero)      # $t0 = 8   <- load-use stall
+    add  $t1, $t0, $s1      # $t1 = 11  <- stall here
+    beq  $s3, $s1, +1       # NOT TAKEN (2 != 3)
+    addi $t2, $zero, 7      # $t2 = 7
+    addi $t3, $zero, 99     # $t3 = 99  
+    FC000000                # HALT
+
+Expected PMU output:
+    Instructions Retired : 10
+    CPU Cycles           : 15
+    CPI                  : 1.50
+    Memory Accesses      : 2
+    Branch Count         : 1
+    Mispredictions       : 0
+    Load-Use Stalls      : 1
+    Prediction Accuracy  : 100.0%
+    Pipeline Efficiency  : 93.3%
+
+
+To run a different program:
+    Replace the hex values in IE2025005_memfile.dat.
+    Always end with fc000000.
+    Recompile and simulate:
+        iverilog -g2012 -o sim IE2025005_pipeline.sv IE2025005_pipeline_tb.sv
+        vvp sim
+--------------------------------------------------

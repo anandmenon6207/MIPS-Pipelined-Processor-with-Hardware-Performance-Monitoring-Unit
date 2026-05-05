@@ -25,15 +25,15 @@ The pipeline handles all data and control hazards:
 
 ```
 ├── src/
-│   ├── IE2025005_pipeline.sv       # Full pipeline + PMU (all modules in one file)
-│   └── IE2025005_pipeline_tb.sv    # Testbench — waits for HALT, prints PMU report
+│   ├── IE2025005_pipeline.sv       # Pipeline + PMU (all modules in one file)
+│   └── IE2025005_pipeline_tb.sv    # Testbench — Prints PMU report
 │
 ├── program/
 │   ├── IE2025005_memfile.dat       # Hex-encoded MIPS program loaded into imem
-│   └── memfile_notes.txt           # Assembly listing + expected PMU values
+│   └── memfile_notes.txt           # Regarding instructions for MIPS program
 │
 ├── docs/
-│   └── pipeline_diagram.svg        # Architecture diagram
+│   └── pipeline_diagram            # Architecture diagram
 │
 ├── waveforms/
 │   └── IE2025005_pipeline.vcd      # GTKWave waveform output
@@ -43,7 +43,7 @@ The pipeline handles all data and control hazards:
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ### Pipeline Stages
 
@@ -158,14 +158,9 @@ gtkwave waveforms/IE2025005_pipeline.vcd
 
 ## 🛠️ Tools
 
-| Tool | Version | Purpose |
-|---|---|---|
-| Icarus Verilog | 12.0 | Compilation and simulation |
-| GTKWave | — | Waveform viewer |
-| VS Code | — | Development environment |
+Icarus Verilog 12.0 - Compilation and simulation
+GTKWave - Waveform viewing
+VS Code - Development environment 
+
 
 ---
-
-<div align="center">
-<sub>IIIT Bangalore · Computer Architecture Open Systems Lab · 2025</sub>
-</div>

@@ -103,14 +103,15 @@ The PMU observes 6 pipeline signals and maintains 64-bit counters:
 **Requirements:** Icarus Verilog 12.0, GTKWave (optional)
 
 ```bash
+# download IE2025005_pipeline.sv, IE2025005_pipeline_tb.sv, IE2025005_memfile.dat into the same folder
 # Compile
-iverilog -g2012 -o sim src/IE2025005_pipeline.sv src/IE2025005_pipeline_tb.sv
+iverilog -g2012 -o sim IE2025005_pipeline.sv IE2025005_pipeline_tb.sv
 
 # Simulate
 vvp sim
 
 # View waveforms (optional)
-gtkwave waveforms/IE2025005_pipeline.vcd
+gtkwave IE2025005_pipeline.vcd
 ```
 
 > Make sure `IE2025005_memfile.dat` is in the **same directory** as the compiled binary when running `vvp sim`.

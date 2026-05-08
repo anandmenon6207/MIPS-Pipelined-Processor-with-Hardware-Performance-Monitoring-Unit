@@ -78,14 +78,12 @@ module regfile
     always @ (posedge clk)
         if (we3) rf[wa3] <= wd3;
 
-    // synthesis off — simulation init only
     initial begin
         for (i = 0; i < 32; i = i + 1)
             rf[i] = 0;
     end
 
-    // Write-then-read: if reading the same reg being written, forward write data
-    assign rd1 = (ra1 == 0) ? 32'b0 :
+    assign rd1 = (ra1 == 0) ? 32'b0 :                 // if 0 then return 0, else if writing to same reg as reading then forward wd3, else read from regfile
                  (we3 && wa3 == ra1) ? wd3 : rf[ra1];
     assign rd2 = (ra2 == 0) ? 32'b0 :
                  (we3 && wa3 == ra2) ? wd3 : rf[ra2];
@@ -135,7 +133,7 @@ module maindec
             6'b000100: controls = 9'b000100001; // beq
             6'b001000: controls = 9'b101000000; // addi
             6'b000010: controls = 9'b000000100; // j
-            6'b000101: controls = 9'b000100001; // bne -- we assign it same as beq because from a decoder point of view they have the same path . only diff at controller.
+            6'b000101: controls = 9'b000100001; // bne 
             default:   controls = 9'bxxxxxxxxx; // invalid
         endcase
 endmodule
@@ -165,11 +163,11 @@ module dmem
      input  [31:0] a, wd,
      output [31:0] rd);
 
-    reg [31:0] RAM[63:0];
+    reg [31:0] RAM[63:0];  //an array of 64 locns each 32 bits wide
 
     assign rd = RAM[a[31:2]];
 
-    always @ (posedge clk)
+    always @ (posedge clk)  //for sw
         if (we) RAM[a[31:2]] <= wd;
 endmodule
 
@@ -177,7 +175,7 @@ module imem
     (input  [5:0]  a,
      output [31:0] rd);
 
-    reg [31:0] RAM[63:0];
+    reg [31:0] RAM[63:0]; // 64 locns 32 bits wide
 
     initial
         $readmemh("IE2025005_memfile.dat", RAM);
@@ -236,9 +234,9 @@ module datapath     //mips pipelined datapath
      output        haltW,
      output [31:0] instrW);      // instrW: instruction word pipelined to Writeback for HALT detection
 
-    // ════════════════════════════════════
+    
     // FETCH STAGE
-    // ════════════════════════════════════
+    
     wire [31:0] pcplus4F, pcnextF;
 
     flopenrc #(32) pcreg(clk, reset, ~stallF, 1'b0, pcnextF, pcF);  // enable=~stallF, no clear needed for PC
@@ -251,7 +249,7 @@ module datapath     //mips pipelined datapath
     // valid bit: 1 = real instruction, 0 = bubble
     wire validD, validE, validM;
     wire halt = (instrF === 32'hFC000000);  // HALT instruction detected
-    flopenrc #(1) validDreg (clk, reset, ~stallD, flushD, ~halt, validD);  // invalid after HALT
+    flopenrc #(1) validDreg (clk, reset, ~stallD, flushD, ~halt, validD);  // invalid after HALT... validD = complement of halt
     wire haltD, haltE, haltM;
     flopenrc #(1) haltDreg  (clk, reset, ~stallD, flushD, halt,  haltD);   // pipeline halt bit
     wire [31:0] instrD, pcplus4D;                      // signals coming out of F/D register into decode stage
@@ -259,9 +257,12 @@ module datapath     //mips pipelined datapath
     flopenrc #(32) instreg(clk, reset, ~stallD, flushD, instrF,   instrD);    // saves instruction. ~stallD - if stalling en=0 register holds old value. flushD - if flushing register is cleared
     flopenrc #(32) pcreg4 (clk, reset, ~stallD, flushD, pcplus4F, pcplus4D); // saves pc+4 value
 
-    // ════════════════════════════════════
+    
+
+
+
     // DECODE STAGE
-    // ════════════════════════════════════
+    
     // regwriteW is now an output port
     // writeregW is now an output port
     wire [31:0] resultW;           // result from ALU or mem. for writeback stage
@@ -308,9 +309,12 @@ module datapath     //mips pipelined datapath
     flopenrc #(5)  rdEreg        (clk, reset, 1'b1, flushE, rdD,         rdE);
     flopenrc #(32) instrEreg     (clk, reset, 1'b1, flushE, instrD,      instrE);  // pipeline instr word D→E
 
-    // ════════════════════════════════════
+    
+
+
+
     // EXECUTE STAGE
-    // ════════════════════════════════════
+    
 
     wire [31:0] srcAE, srcBE, signimmshE, pcbranchE;
     // pcsrcE is an output port — driven here
@@ -328,8 +332,8 @@ module datapath     //mips pipelined datapath
     // 3-way forwarding mux for srcAE
     always @(*)
         case (forwardAE)
-            2'b10:    fwdAE = aluoutM;   // forward from Memory stage
-            2'b01:    fwdAE = resultW;   // forward from Writeback stage
+            2'b10:    fwdAE = aluoutM;   // forward from Memory stage //ex/mem
+            2'b01:    fwdAE = resultW;   // forward from Writeback stage   // mem/wb
             default:    fwdAE = rd1E;      // no hazard, use register file
         endcase
     assign srcAE = fwdAE;
@@ -337,8 +341,8 @@ module datapath     //mips pipelined datapath
     // 3-way forwarding mux for srcBE (feeds into srcbmux)
     always @(*)
         case (forwardBE)
-            2'b10:    fwdBE = aluoutM;   // forward from Memory stage
-            2'b01:    fwdBE = resultW;   // forward from Writeback stage
+            2'b10:    fwdBE = aluoutM;   // forward from Memory stage   // from ex/mem
+            2'b01:    fwdBE = resultW;   // forward from Writeback stage   //from mem/wb
             default:    fwdBE = rd2E;      // no hazard, use register file
         endcase
 
@@ -366,9 +370,9 @@ module datapath     //mips pipelined datapath
     flopr #(1)  haltMreg      (clk, reset, haltE,      haltM);
     flopr #(32) instrMreg     (clk, reset, instrE,     instrM);   // pipeline instr word E→M
 
-    // ════════════════════════════════════
+    
     // MEMORY STAGE
-    // ════════════════════════════════════
+    
 
     // ── M/W pipeline register ──
     wire        memtoregW;
@@ -383,19 +387,21 @@ module datapath     //mips pipelined datapath
     flopr #(1)  haltWreg     (clk, reset, haltM,     haltW);
     flopr #(32) instrWreg    (clk, reset, instrM,    instrW);    // pipeline instr word M→W (used by PMU for combinational HALT detect)
 
-    // ════════════════════════════════════
+    
     // WRITEBACK STAGE
-    // ════════════════════════════════════
+    
     mux2 #(32) resmux(aluoutW, readdataW, memtoregW, resultW);  //ALU output or memory read data
 
 
 endmodule
 
-// ════════════════════════════════════════════════════════════
+
+
+
 // CONTROLLER
 // Decodes the instruction in Decode stage.
 // Instantiates maindec and aludec — same as single-cycle.
-// ════════════════════════════════════════════════════════════
+
 module controller
     (input  [5:0] op, funct,
      input        equalD,
@@ -430,11 +436,12 @@ module controller
 
 endmodule
 
-// ════════════════════════════════════════════════════════════
+
+
 // MIPS TOP MODULE
 // Wires together: controller, datapath, imem, dmem
 // No logic here — pure structural connections
-// ════════════════════════════════════════════════════════════
+
 module mips
     (input clk, reset);
 
@@ -575,11 +582,13 @@ module mips
 
 endmodule
 
-// ════════════════════════════════════════════════════════════
+
+
+
 // HAZARD UNIT
 // Purely combinational — no clock.
 // Handles forwarding, load-use stalls, and branch flushes.
-// ════════════════════════════════════════════════════════════
+
 module hazard
     (// Register numbers
      input  [4:0] rsE, rtE,       // source regs in Execute
@@ -640,10 +649,12 @@ module hazard
 
 endmodule
 
-// ════════════════════════════════════════════════════════════
+
+
+
 // TOP MODULE
 // Instantiates mips. Drives clk and reset for simulation.
-// ════════════════════════════════════════════════════════════
+
 module top;
 
     reg clk, reset;
@@ -663,7 +674,7 @@ module top;
 
 endmodule
 
-// ════════════════════════════════════════════════════════════
+
 // PMU — Hardware Performance Monitoring Unit
 // Observes pipeline signals and counts performance events.
 // All counters are 64-bit to avoid overflow.
@@ -672,7 +683,7 @@ endmodule
 // KEY CHANGE: instrW (32-bit instruction word at Writeback) replaces
 // haltW/haltM gating. isHaltW is combinational — no clock edge, no
 // same-posedge race. Removed ports: regwriteW, writeregW, haltW, haltM.
-// ════════════════════════════════════════════════════════════
+
 module pmu
     (input         clk, reset,
      // Signals from pipeline

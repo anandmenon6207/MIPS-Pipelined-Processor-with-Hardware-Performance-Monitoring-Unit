@@ -25,12 +25,20 @@ The pipeline handles all data and control hazards:
 
 ```
 ├── src/
-│   ├── IE2025005_pipeline.sv       # Pipeline + PMU (all modules in one file)
-│   └── IE2025005_pipeline_tb.sv    # Testbench — Prints PMU report
+│   ├── primitives.sv        # flopenrc, flopr, mux2, adder, sl2, signext
+│   ├── regfile.sv           # Register file
+│   ├── alu.sv               # ALU, maindec, aludec
+│   ├── memory.sv            # imem, dmem
+│   ├── controller.sv        # Controller
+│   ├── hazard.sv            # Hazard unit
+│   ├── pmu.sv               # Hardware Performance Monitoring Unit
+│   ├── datapath.sv          # Full 5-stage pipelined datapath
+│   ├── mips.sv              # MIPS top module + simulation top
+│   └── pipeline_tb.sv       # Testbench — prints PMU report
 │
 ├── program/
-│   ├── IE2025005_memfile.dat       # Hex-encoded MIPS program loaded into imem
-│   └── memfile_notes.txt           # Regarding instructions for MIPS program
+│   ├── memfile.dat          # Hex-encoded MIPS program loaded into imem
+│   └── memfile_notes.txt    # Assembly listing + expected PMU values
 │
 └── README.md
 ```
@@ -103,9 +111,9 @@ The PMU observes 6 pipeline signals and maintains 64-bit counters:
 **Requirements:** Icarus Verilog 12.0, GTKWave (optional)
 
 ```bash
-# download IE2025005_pipeline.sv, IE2025005_pipeline_tb.sv, IE2025005_memfile.dat into the same folder
+# download all .sv files and memfile.dat into the same folder
 # Compile
-iverilog -g2012 -o sim IE2025005_pipeline.sv IE2025005_pipeline_tb.sv
+iverilog -g2012 -o sim primitives.sv regfile.sv alu.sv memory.sv controller.sv hazard.sv pmu.sv datapath.sv mips.sv pipeline_tb.sv
 
 # Simulate
 vvp sim
@@ -114,7 +122,7 @@ vvp sim
 gtkwave IE2025005_pipeline.vcd
 ```
 
-> Make sure `IE2025005_memfile.dat` is in the **same directory** as the compiled binary when running `vvp sim`.
+> Make sure `memfile.dat` is in the **same directory** as the compiled binary when running `vvp sim`.
 
 ---
 

@@ -15,7 +15,7 @@ Conditions / Constraints
 
 --------------------------------------------------
 
-The memfile (IE2025005_memfile.dat) contains the hex-encoded MIPS program
+The memfile (memfile.dat) contains the hex-encoded MIPS program
 loaded into instruction memory at simulation start.
 
 IMPORTANT: Every program must end with FC000000 (HALT instruction).
@@ -51,9 +51,8 @@ Expected PMU output:
 
 
 To run a different program:
-    Replace the hex values in IE2025005_memfile.dat.
+    Replace the hex values in memfile.dat.
     Always end with fc000000.
-    Recompile and simulate:
-        iverilog -g2012 -o sim IE2025005_pipeline.sv IE2025005_pipeline_tb.sv
+    Recompile and simulate
         vvp sim
 --------------------------------------------------
